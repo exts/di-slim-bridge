@@ -6,6 +6,7 @@ include __DIR__ . '/fixtures/ExampleMiddleware.php';
 use Exts\DSB\Application;
 use Exts\DSB\CallableResolver;
 use Exts\DSB\Container\Container;
+use Exts\DSB\DI\IDependencyInjector;
 use Exts\DSB\Services\CallableResolverServiceProvider;
 use Exts\DSB\Services\DefaultServiceProvider;
 
@@ -47,7 +48,18 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
 
         $getContainer = $app->getContainer();
 
-        $this->assertTrue($getContainer['callableResolver'] instanceof CallableResolver);
+        $this->assertInstanceOf(CallableResolver::class, $getContainer['callableResolver']);
+    }
+
+    public function testIfApplicationReturnsProperDI()
+    {
+        $container = new Container();
+        $container->registerService(CallableResolverServiceProvider::class);
+        $container->registerService(DefaultServiceProvider::class);
+
+        $app = new Application($container);
+
+        $this->assertInstanceOf(IDependencyInjector::class, $app->getInjector());
     }
 
     public function testControllerAutoResolveCallable()
@@ -67,7 +79,7 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
 
         $response = $app->run(true);
 
-        $this->assertTrue($response->getBody() == 'hello');
+        $this->assertEquals('hello', $response->getBody());
 
     }
 
@@ -88,7 +100,7 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
 
         $response = $app->run(true);
 
-        $this->assertTrue($response->getBody() == 'Hi lamonte');
+        $this->assertEquals('Hi lamonte', $response->getBody());
     }
 
     public function testRouteMiddlewareAutoResolve()
@@ -108,6 +120,6 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
 
         $response = $app->run(true);
 
-        $this->assertTrue($response->getBody() == 'hello testing worLD');
+        $this->assertEquals('hello testing worLD', $response->getBody());
     }
 }

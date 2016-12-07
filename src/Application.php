@@ -2,6 +2,7 @@
 namespace Exts\DSB;
 
 use Exts\DSB\Container\Container;
+use Exts\DSB\DI\IDependencyInjector;
 use Interop\Container\ContainerInterface;
 use Slim\App;
 
@@ -28,5 +29,20 @@ class Application extends App
         }
 
         parent::__construct($container);
+    }
+
+    /**
+     * @return IDependencyInjector|null
+     */
+    public function getInjector() : ?IDependencyInjector
+    {
+        $container = $this->getContainer();
+
+        $dependencyInjector = $container['di'] ?? null;
+        if($dependencyInjector instanceof IDependencyInjector) {
+            return $dependencyInjector;
+        }
+
+        return null;
     }
 }
